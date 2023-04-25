@@ -30,3 +30,11 @@
 *.exe
 *.out
 *.app
+
+# Build & run directory 
+_build/
+bin/
+include/
+
+# netCDF Files
+*.nc

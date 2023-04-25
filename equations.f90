@@ -224,22 +224,12 @@ module equations
       do j = 1,ny
         ! Keep this indented
         sRemap(i,j,3)   = h0 - perturb * exp( -( ( startX - 1 + float( i - 1 ) * deltaX )**2 + ( startY + float( j - 1 ) * deltaY )**2 ) / fwhm**2 )
-        ! write( *, "(a,1f4.2)", advance="no" ) " ", sRemap(i,j,3)
       end do
-      ! write( *, * ) " "
     end do
 
 #ifdef _OPENMP 
     !$OMP END PARALLEL DO
 #endif
-
-    ! do i = 1,nx
-    !   do j = 1,ny
-    !     write( *, "(a,1f4.2)", advance="no" ) " ", sRemap(i,j,3)
-    !   end do
-    !   write( *, * ) " "
-    ! end do
-
 
     ! s has been modified
 
@@ -434,88 +424,10 @@ module equations
     call mpi_wait( jPrevReq, jPrevReqMPIStatus, mpiErr )
     call handleMPIErr( mpiErr )
 
-    ! ! Write out block
-    ! if ( processRank == 2 ) then
-    !   ! write( *, * ) "Process Rank: ", processRank, " [A]", aRank, " [B]", bRank
-    !   ! do i = nx-1,nx-1
-    !   !   do j = 0,ny-1
-    !   !     write( *, "(a,1f8.6)", advance="no" ) " ", sRemap(i,j,2)
-    !   !   end do
-    !   !   write( *, * ) " "
-    !   ! end do
-    !   ! write( *, * ) " "
-    !   flush( 0 )
-    !   write( *, * ) "Process Rank: ", processRank, " sent to ", mod( ( sqrtCluster + bRank ), sqrtCluster )  * sqrtCluster + mod( sqrtCluster + aRank - 1, sqrtCluster ), &
-    !                 " iNextBoundary: ", sRemap(0,:,:)
-    !   write( *, * ) "Process Rank: ", processRank, " sent to ", mod( ( sqrtCluster + bRank ), sqrtCluster )  * sqrtCluster + mod( sqrtCluster + aRank + 1, sqrtCluster ), &
-    !                 " iPrevBoundary: ", sRemap(nx - 1,:,:)
-    !   write( *, * ) "Process Rank: ", processRank, " sent to ", mod( ( sqrtCluster + bRank - 1 ), sqrtCluster )  * sqrtCluster + mod( sqrtCluster + aRank, sqrtCluster ), &
-    !                 " jNextBoundary: ", sRemap(:,0,:)
-    !   write( *, * ) "Process Rank: ", processRank, " sent to ", mod( ( sqrtCluster + bRank + 1 ), sqrtCluster )  * sqrtCluster + mod( sqrtCluster + aRank, sqrtCluster ), &
-    !                 " jPrevBoundary: ", sRemap(:,ny - 1,:)
-    !   flush( 0 )
-      
-    !   write( *, * ) " iNextReqMPIStatus MPI_STATUS  : ", iNextReqMPIStatus(:)
-    !   write( *, * ) " iPrevReqMPIStatus MPI_STATUS  : ", iPrevReqMPIStatus(:)
-    !   write( *, * ) " jNextReqMPIStatus MPI_STATUS  : ", jNextReqMPIStatus(:)
-    !   write( *, * ) " jPrevReqMPIStatus MPI_STATUS  : ", jPrevReqMPIStatus(:)
-    !   flush( 0 )
-
-    ! endif
-
-    ! ! Sync all processes
-    ! call mpi_barrier( MPI_COMM_WORLD, mpiErr )
-
-    ! if ( processRank == 0 ) then
-    !   flush( 0 )
-    !   write( *, * ) "Process Rank: ", processRank, " jNextBoundary : ", jNextBoundary
-    !   flush( 0 )
-    !   write( *, * ) "Process Rank: ", processRank, " jPrevBoundary : ", jPrevBoundary
-    !   flush( 0 )
-    !   write( *, * ) "jNextBoundary status : [MPI_SOURCE] : ", jNextReqMPIStatus(MPI_SOURCE), &
-    !                                          " [MPI_TAG] : ", jNextReqMPIStatus(MPI_TAG),    &
-    !                                        " [MPI_ERROR] : ", jNextReqMPIStatus(MPI_ERROR),  &
-    !                                        " MPI_STATUS  : ", jNextReqMPIStatus(:)
-    !   flush( 0 )
-    !   write( *, * ) "jPrevBoundary status : [MPI_SOURCE] : ", jPrevReqMPIStatus(MPI_SOURCE), &
-    !                                          " [MPI_TAG] : ", jPrevReqMPIStatus(MPI_TAG),    &
-    !                                        " [MPI_ERROR] : ", jPrevReqMPIStatus(MPI_ERROR),  &
-    !                                        " MPI_STATUS  : ", jPrevReqMPIStatus(:)
-    !   flush( 0 )
-    !   ! call handleMPIErr( jNextReqMPIStatus(MPI_ERROR) )
-    !   ! call handleMPIErr( jPrevReqMPIStatus(MPI_ERROR) )
-
-    ! endif
-    
-    ! ! Sync all processes
-    ! call mpi_barrier( MPI_COMM_WORLD, mpiErr )
-
-    ! if ( processRank == 3 ) then
-    !   flush( 0 )
-    !   write( *, * ) "Process Rank: ", processRank, " iNextBoundary : ", iNextBoundary
-    !   flush( 0 )
-    !   write( *, * ) "Process Rank: ", processRank, " iPrevBoundary : ", iPrevBoundary
-    !   flush( 0 )
-    !   write( *, * ) "iNextBoundary status : [MPI_SOURCE] : ", iNextReqMPIStatus(MPI_SOURCE), &
-    !                                          " [MPI_TAG] : ", iNextReqMPIStatus(MPI_TAG),    &
-    !                                        " [MPI_ERROR] : ", iNextReqMPIStatus(MPI_ERROR),  &
-    !                                        " MPI_STATUS  : ", iNextReqMPIStatus(:)
-    !   flush( 0 )
-    !   write( *, * ) "iPrevBoundary status : [MPI_SOURCE] : ", iPrevReqMPIStatus(MPI_SOURCE), &
-    !                                          " [MPI_TAG] : ", iPrevReqMPIStatus(MPI_TAG),    &
-    !                                        " [MPI_ERROR] : ", iPrevReqMPIStatus(MPI_ERROR),  &
-    !                                        " MPI_STATUS  : ", iPrevReqMPIStatus(:)
-    !   flush( 0 )
-    !   ! call handleMPIErr( iNextReqMPIStatus(MPI_ERROR) )
-    !   ! call handleMPIErr( iPrevReqMPIStatus(MPI_ERROR) )
-    ! endif
-
-
 #endif
 
 
 #ifdef _OPENMP 
-    ! write( *, * ) "Running OpenMP"
     !$OMP PARALLEL DO &
     !$OMP PRIVATE( i, j, iNext, iPrev, jNext, jPrev, iNextPtr, iPrevPtr, jNextPtr, jPrevPtr ) 
 #endif
@@ -536,24 +448,20 @@ module equations
 #ifdef USE_MPI
         ! This could be moved to outer loop
         if ( iNext == 0 ) then
-          ! Remap to what we received, custom to bounds iNext
           ! write( *, * ) "i is ", i, "... remapping iNextPtr"
           iNextPtr( iNext:iNext, 0:ny-1, 0:get_system_size()-1 ) => iNextBoundary(:)
           
         else if ( iPrev == ( nx - 1 ) ) then
-          ! write( *, * ) "i is ", i, "... remapping iPrevPtr"
           ! Remap to what we received, custom to bounds iPrev
           iPrevPtr( iPrev:iPrev, 0:ny-1, 0:get_system_size()-1 ) => iPrevBoundary(:)
 
         endif
 
         if ( jNext == 0 ) then
-          ! write( *, * ) "j is ", j, "... remapping jNextPtr"
           ! Remap to what we received, custom to bounds jNext
           jNextPtr( 0:nx-1, jNext:jNext, 0:get_system_size()-1 ) => jNextBoundary(:)
 
         else if ( jPrev == ( ny - 1 ) ) then
-          ! write( *, * ) "j is ", j, "... remapping jPrevPtr"
           ! Remap to what we received, custom to bounds jPrev
           jPrevPtr( 0:nx-1, jPrev:jPrev, 0:get_system_size()-1 ) => jPrevBoundary(:)
 
@@ -593,19 +501,6 @@ module equations
     call mpi_wait( jPrevReqSend, jPrevReqSendMPIStatus, mpiErr )
     call handleMPIErr( mpiErr )
 
-    ! call mpi_barrier( MPI_COMM_WORLD, mpiErr )
-
-    ! if ( processRank == 2 ) then
-    !   flush( 0 )
-      
-    !   write( *, * ) " iNextReqSendMPIStatus MPI_STATUS  : ", iNextReqSendMPIStatus(:)
-    !   write( *, * ) " iPrevReqSendMPIStatus MPI_STATUS  : ", iPrevReqSendMPIStatus(:)
-    !   write( *, * ) " jNextReqSendMPIStatus MPI_STATUS  : ", jNextReqSendMPIStatus(:)
-    !   write( *, * ) " jPrevReqSendMPIStatus MPI_STATUS  : ", jPrevReqSendMPIStatus(:)
-    !   flush( 0 )
-    ! endif
-
-    ! call mpi_barrier( MPI_COMM_WORLD, mpiErr )
 #endif
 
   end subroutine f

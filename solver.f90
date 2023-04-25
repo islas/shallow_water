@@ -1,6 +1,4 @@
-! My first FORTRAN program
-
-
+! Shallow water driver
 module integration
   private
 
@@ -56,35 +54,15 @@ module integration
     ! Propagate time, multiply to avoid FP round off errors, may need to seed with initial time
     time = timestep * iter
 
-! #ifdef USE_MPI
-!     ! Sync all processes
-!     call mpi_barrier( MPI_COMM_WORLD, mpiErr )
-! #endif
-
     ! MPI could be used here to have 3 processes calculating each one
     ! This is k1
     call f( time, state(:), k1 )
 
-! #ifdef USE_MPI
-!     ! Sync all processes
-!     call mpi_barrier( MPI_COMM_WORLD, mpiErr )
-! #endif
-
     ! This is k2
     call f( time + timestep * 0.5, state(:) + k1(:) * timestep * 0.5, k2 )
 
-! #ifdef USE_MPI
-!     ! Sync all processes
-!     call mpi_barrier( MPI_COMM_WORLD, mpiErr )
-! #endif
-
     ! This is k3
     call f( time + timestep, state(:) - timestep * k1(:) + 2 * timestep * k2(:), k3 )
-
-! #ifdef USE_MPI
-!     ! Sync all processes
-!     call mpi_barrier( MPI_COMM_WORLD, mpiErr )
-! #endif
 
     ! New state
     state(:) = state(:) + timestep / 6.0 * ( k1(:) + 4.0 * k2(:) + k3(:) )
@@ -139,12 +117,6 @@ program solver
   call observer_init()
   call observer_write( stateVector )
 
-! #ifdef USE_MPI
-!     ! Sync all processes
-!     call mpi_barrier( MPI_COMM_WORLD, mpiErr )
-! #endif
-i
-
   ! Allocate interpolation scratch
   allocate( k1Scratch(size(stateVector) ) )
   allocate( k2Scratch(size(stateVector) ) )
@@ -166,12 +138,6 @@ i
     ! call forwardEuler( i, timestep, stateVector, k1Scratch )
     
     if ( mod( i, writeInterval ) == 0.0 ) then
-      ! write( *, * ) "[SOLVER] Doing write"
-      ! write( *, * ) "Iteration : ", i
-! #ifdef USE_MPI
-!       ! Sync all processes
-!       call mpi_barrier( MPI_COMM_WORLD, mpiErr )
-! #endif
       call observer_write( stateVector )
     endif
     

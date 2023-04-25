@@ -160,12 +160,6 @@ module observer
 
 #endif
 
-    ! do i = 1,nx
-    !   do j = 1,ny
-    !     write( *, "(a,1f4.2)", advance="no" ) " ", sRemap(i,j,3,1)
-    !   end do
-    !   write( *, * ) " "
-    ! end do
     ! write( *, * ) "Writing into frame ", frame
     stat = nf90_put_var( ncid, varIDState, sRemap, start=[ writeX, writeY, 1, frame ] )
     if ( stat /= NF90_NOERR ) then
